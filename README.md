@@ -1,17 +1,17 @@
 
 # vephar
 
+**vephar** vephar is a simple library that transform you arrays in collections/resources.
+
+**Note:** vephar uses `illuminate/support` under the hood. If you are using laravel or lumen framework, make sure that you version is  **>= 5.5**  until **6.x**, if you're not using any of this frameworks or this this dependency(illuminate/support) , than you have nothing to worry. 
+
+
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
 [![Build Status][ico-travis]][link-travis]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
-
-
-**vephar** vephar is a simple library that transform you arrays in collections/resources.
-
-**Note:** vephar uses `illuminate/support` under the hood. If you are using laravel or lumen framework, make sure that you version is  **>= 5.5**  until **6.x**, if you're not using any of this frameworks or this this dependency(illuminate/support) , than you have nothing to worry. 
 
 
 ## Install
