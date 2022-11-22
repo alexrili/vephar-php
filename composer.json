@@ -15,12 +15,12 @@
         }
     ],
     "require": {
-        "php": "~7.2",
-        "illuminate/support": "^5.5 || ^6.0",
+        "php": ">=7.2",
+        "illuminate/support": ">=5.5",
         "ext-json": "*"
     },
     "require-dev": {
-        "fzaninotto/faker": "^1.9",
+        "fakerphp/faker": ">=1.20",
         "phpunit/phpunit": ">=8.0",
         "squizlabs/php_codesniffer": "^3.0"
     },
