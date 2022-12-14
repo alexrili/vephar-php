@@ -1,0 +1,11 @@
+services:
+    phmap:
+        container_name: vephar
+        image: alexrili/vephar
+        build:
+            context: .
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
