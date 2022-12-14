@@ -5,8 +5,18 @@ namespace Hell\Vephar\Contracts;
 
 use Hell\Vephar\Response;
 
+/**
+ * @author '@alexrili'
+ * @class ResourceContract
+ * @package Hell\Vephar\Contracts
+ */
 abstract class ResourceContract
 {
+    /**
+     * @var bool
+     */
+    public $goDeeper = true;
+
     /**
      * ResourceContract constructor.
      * @param $data
@@ -19,7 +29,6 @@ abstract class ResourceContract
             return;
         }
         $this->byDinamicallyAttribute($data);
-        return;
     }
 
     /**
@@ -34,9 +43,9 @@ abstract class ResourceContract
         foreach ($methods as $method) {
             preg_match(' /^(set)(.*?)$/i', $method, $results);
             $setMethod = $results[1] ?? '';
-            $attritbuteName = toCamelCase($results[2] ?? '');
-            if ($setMethod == 'set' && array_key_exists($attritbuteName, $data)) {
-                $object->$method($this->getValue($data[$attritbuteName]));
+            $attributeName = toCamelCase($results[2] ?? '');
+            if ($setMethod == 'set' && array_key_exists($attributeName, $data)) {
+                $object->$method($this->getValue($data[$attributeName]));
             }
         }
 
@@ -62,6 +71,18 @@ abstract class ResourceContract
     }
 
     /**
+     * @param $value
+     * @return mixed
+     */
+    protected function getValue($value)
+    {
+        if (!$this->goDeeper || !is_array($value) || !is_object_array($value)) {
+            return $value;
+        }
+        return Response::resource($value);
+    }
+
+    /**
      * @param $data
      */
     protected function byDinamicallyAttribute($data)
@@ -70,18 +91,6 @@ abstract class ResourceContract
             $attributeName = toCamelCase($attribute);
             $this->{$attributeName} = $this->getValue($value);
         }
-    }
-
-    /**
-     * @param $value
-     * @return mixed
-     */
-    protected function getValue($value)
-    {
-        if (!is_array($value) || !is_object_array($value)) {
-            return $value;
-        }
-        return Response::resource($value);
     }
 
     /**
@@ -95,5 +104,14 @@ abstract class ResourceContract
             $newAttributes[toSnakeCase($key)] = $value;
         }
         return $newAttributes;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function toOriginalArray(): array
+    {
+        return json_decode(json_encode(get_object_vars($this)), true);
     }
 }

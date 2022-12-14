@@ -4,7 +4,9 @@ namespace Hell\Vephar;
 
 use Hell\Vephar\Fake\CustomCollection;
 use Hell\Vephar\Fake\CustomResource;
+use Hell\Vephar\Fake\CustomResourceCases;
 use Hell\Vephar\Fake\CustomResourceWithCustomAttributes;
+use Hell\Vephar\Fake\CustomResourceWithoutGoDeeper;
 use Hell\Vephar\Fake\FakeApiRequest;
 
 class ResponseTest extends TestCase
@@ -37,8 +39,8 @@ class ResponseTest extends TestCase
         $responseOne = Response::resource($dataOne);
         $responseAll = Response::collection($dataAll);
 
-        $this->assertCount(count($dataOne), $responseOne->toArray());
-        $this->assertCount(count($dataAll), $responseAll->toArray());
+        $this->assertIsArray($responseOne->toArray());
+        $this->assertIsArray($responseAll->toArray());
     }
 
     /** @test */
@@ -78,5 +80,30 @@ class ResponseTest extends TestCase
         $customResource = CustomResourceWithCustomAttributes::class;
         $response = Response::resource($resource, $customResource);
         $this->assertNotEmpty($response->myCustomAttribute);
+    }
+
+    /** @test */
+    public function shouldNotObjectfyNestedArrayWhenNestedIsSetToFalse()
+    {
+        $data = [
+            'first_stage'=>[
+                'second_stage'=> 'value'
+            ]
+        ];
+        $resource = Response::resource($data,CustomResourceWithoutGoDeeper::class);
+
+        $this->assertIsArray($resource->firstStage);
+        $this->assertEquals($resource->firstStage, $data['first_stage']);
+    }
+
+    /** @test */
+    public function shouldReturnOriginalArray()
+    {
+        $data = [
+            'firstAttribute'=> 'value'
+        ];
+        $resource = Response::resource($data,CustomResourceCases::class);
+        $this->assertEquals($resource->toArray()['first_attribute'], $data['firstAttribute']);
+        $this->assertEquals($resource->toOriginalArray()['firstAttribute'], $data['firstAttribute']);
     }
 }
