@@ -3,10 +3,13 @@
 
 namespace Hell\Vephar;
 
-use Illuminate\Support\Arr;
+
+use Hell\Vephar\Helpers\Arr;
+
 
 /**
- * Class Response
+ * @author '@alexrili'
+ * @class Response
  * @package Hell\Vephar
  */
 class Response
@@ -51,14 +54,13 @@ class Response
         $this->collection = $collection;
     }
 
-
     /**
      * @param array $data
      * @param string $resource
      * @param string $collection
      * @return mixed
      */
-    public static function collection(
+    public static function toObject(
         $data = [],
         string $resource = Resource::class,
         string $collection = Collection::class
@@ -66,6 +68,28 @@ class Response
         return (new Response($resource, $collection))->make($data);
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function make($data)
+    {
+        if (Arr::isAssoc((array)$data)) {
+            return $this->toResource((array)$data);
+        }
+
+        return $this->toCollect($data);
+    }
+
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    protected function toResource($data = [])
+    {
+        return new $this->resource($data);
+    }
 
     /**
      * @param array $data
@@ -79,40 +103,5 @@ class Response
         }
 
         return new $this->collection($items);
-    }
-
-
-    /**
-     * @param array $data
-     * @param string $resource
-     * @return mixed
-     */
-    public static function resource($data = [], string $resource = Resource::class)
-    {
-        return (new Response($resource))->make($data);
-    }
-
-
-    /**
-     * @param $data
-     * @return mixed
-     */
-    protected function toResource($data = [])
-    {
-        return new $this->resource($data);
-    }
-
-
-    /**
-     * @param $data
-     * @return mixed
-     */
-    public function make($data)
-    {
-        if (Arr::isAssoc((array)$data)) {
-            return $this->toResource((array)$data);
-        }
-
-        return $this->toCollect($data);
     }
 }

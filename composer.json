@@ -16,7 +16,6 @@
     ],
     "require": {
         "php": ">=7.2",
-        "illuminate/support": ">=5.5",
         "ext-json": "*"
     },
     "require-dev": {
@@ -29,7 +28,8 @@
             "Hell\\Vephar\\": "src"
         },
         "files": [
-            "./src/Helpers/helpers.php"
+            "./src/Helpers/helpers.php",
+            "./src/Consts/consts.php"
         ]
     },
     "autoload-dev": {
