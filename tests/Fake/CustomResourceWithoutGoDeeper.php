@@ -17,10 +17,8 @@ class CustomResourceWithoutGoDeeper extends Resource
      * @var
      */
     public $firstStage;
-    /**
-     * @var bool
-     */
-    public $goDeeper = false;
+    protected $setters = true;
+
 
     /**
      * @param mixed $firstStage

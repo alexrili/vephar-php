@@ -81,21 +81,14 @@ class CustomResourceWithCustomAttributes extends ResourceContract
         $this->lastName = $lastName;
     }
 
-    /**
-     * @param $lastName
-     * @param $name
-     */
-    public function setMyCustomAttribute($lastName, $name): void
-    {
-        $this->myCustomAttribute = $lastName . ", " . $name;
-    }
 
     /**
-     * @param $customResource
+     * @return string
      */
-    public function setCustomAttributes($customResource)
+    public function getMyCustomAttribute()
     {
-        $this->setMyCustomAttribute($customResource->lastName, $customResource->name);
+        return $this->lastName . ' ' . $this->name;
     }
+
 
 }

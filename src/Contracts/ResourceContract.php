@@ -3,7 +3,10 @@
 
 namespace Hell\Vephar\Contracts;
 
+use Hell\Vephar\Helpers\Str;
+use Hell\Vephar\Resource;
 use Hell\Vephar\Response;
+
 
 /**
  * @author '@alexrili'
@@ -15,25 +18,33 @@ abstract class ResourceContract
     /**
      * @var bool
      */
-    public $goDeeper = true;
+    protected $keepRecursion = false;
+    /**
+     * @var bool
+     */
+    protected $toCamelCase = false;
+    /**
+     * @var bool
+     */
+    protected $setters = false;
 
     /**
      * ResourceContract constructor.
      * @param $data
-     * @param bool $setters
      */
-    public function __construct($data, $setters = true)
+    public function __construct($data)
     {
-        if ($setters) {
+        if ($this->setters) {
             $this->bySetMethod($data);
             return;
         }
+
         $this->byDinamicallyAttribute($data);
     }
 
     /**
      * @param $data
-     * @return ResourceContract
+     * @return \Hell\Vephar\Contracts\ResourceContract
      */
     public function bySetMethod($data)
     {
@@ -41,16 +52,12 @@ abstract class ResourceContract
         $object = $this;
         $methods = get_class_methods($object);
         foreach ($methods as $method) {
-            preg_match(' /^(set)(.*?)$/i', $method, $results);
-            $setMethod = $results[1] ?? '';
-            $attributeName = toCamelCase($results[2] ?? '');
-            if ($setMethod == 'set' && array_key_exists($attributeName, $data)) {
-                $object->$method($this->getValue($data[$attributeName]));
+            $isSetMethod = preg_match(SET_METHOD_PATTERN, $method, $results);
+            if ($isSetMethod) {
+                $methodName = $results[0];
+                $attributeName = Str::toCamelCase($results[1]);
+                $object->$methodName($this->getValue($data[$attributeName] ?? null));
             }
-        }
-
-        if (method_exists($object, "setCustomAttributes")) {
-            $object->setCustomAttributes(new $this($data, false));
         }
 
         return $object;
@@ -64,7 +71,7 @@ abstract class ResourceContract
     {
         $newData = [];
         foreach ($data as $attribute => $value) {
-            $attributeName = toCamelCase($attribute);
+            $attributeName = Str::toCamelCase($attribute);
             $newData[$attributeName] = $value;
         }
         return $newData;
@@ -76,7 +83,7 @@ abstract class ResourceContract
      */
     protected function getValue($value)
     {
-        if (!$this->goDeeper || !is_array($value) || !is_object_array($value)) {
+        if (!$this->keepRecursion || !is_array($value)) {
             return $value;
         }
         return Response::resource($value);
@@ -87,10 +94,41 @@ abstract class ResourceContract
      */
     protected function byDinamicallyAttribute($data)
     {
-        foreach ($data as $attribute => $value) {
-            $attributeName = toCamelCase($attribute);
-            $this->{$attributeName} = $this->getValue($value);
+        $object = $this;
+        $child = get_class($object);
+        if ($child == Resource::class) {
+            foreach ($data as $attribute => $value) {
+                $attributeName = $this->getAttributeName($attribute);
+                $this->{$attributeName} = $this->getValue($value);
+            }
+            return;
         }
+
+        $attributes = get_class_vars($child);
+        foreach ($attributes as $attribute => $value) {
+            if (!$this->isReservedVar($attribute)) {
+                $attributeName = $this->getAttributeName($attribute);
+                $this->{$attributeName} = $this->getValue($data[$attribute] ?? $value);
+            }
+        }
+    }
+
+    /**
+     * @param $attributeName
+     * @return mixed|string
+     */
+    protected function getAttributeName($attributeName)
+    {
+        return $this->toCamelCase ? Str::toCamelCase($attributeName) : $attributeName;
+    }
+
+    /**
+     * @param $attribute
+     * @return false|int
+     */
+    protected function isReservedVar($attribute)
+    {
+        return preg_match("/" . $attribute . "/", RESERVED_VARS);
     }
 
     /**
@@ -101,11 +139,10 @@ abstract class ResourceContract
         $attributes = get_object_vars($this);
         $newAttributes = [];
         foreach ($attributes as $key => $value) {
-            $newAttributes[toSnakeCase($key)] = $value;
+            $newAttributes[Str::toSnakeCase($key)] = $value;
         }
         return $newAttributes;
     }
-
 
     /**
      * @return array

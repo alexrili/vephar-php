@@ -4,14 +4,19 @@ namespace Hell\Vephar;
 
 use Hell\Vephar\Contracts\ResourceContract;
 
+
 /**
- * Class Resource
+ * @author '@alexrili'
+ * @class Resource
  * @package Hell\Vephar
  */
 class Resource extends ResourceContract
 {
-    public function __construct($data, $setters = false)
+    /**
+     * @param $data
+     */
+    public function __construct($data)
     {
-        parent::__construct($data, $setters);
+        parent::__construct($data);
     }
 }

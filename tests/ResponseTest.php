@@ -17,8 +17,8 @@ class ResponseTest extends TestCase
     {
         $dataOne = FakeApiRequest::getOne();
         $resource = Resource::class;
-        $this->assertInstanceOf($resource, Response::resource($dataOne));
-        $this->assertInstanceOf($resource, Response::collection($dataOne));
+        $this->assertInstanceOf($resource, response_to_object($dataOne));
+        $this->assertInstanceOf($resource, response_to_object($dataOne));
         $this->assertInstanceOf($resource, (new Response())->make($dataOne));
     }
 
@@ -26,8 +26,8 @@ class ResponseTest extends TestCase
     public function shouldReturnInstanceOfCollection()
     {
         $dataAll = FakeApiRequest::getAll();
-        $this->assertInstanceOf(Collection::class, Response::resource($dataAll));
-        $this->assertInstanceOf(Collection::class, Response::collection($dataAll));
+        $this->assertInstanceOf(Collection::class, response_to_object($dataAll));
+        $this->assertInstanceOf(Collection::class, response_to_object($dataAll));
         $this->assertInstanceOf(Collection::class, (new Response())->make($dataAll));
     }
 
@@ -36,8 +36,8 @@ class ResponseTest extends TestCase
     {
         $dataOne = FakeApiRequest::getOne();
         $dataAll = FakeApiRequest::getAll();
-        $responseOne = Response::resource($dataOne);
-        $responseAll = Response::collection($dataAll);
+        $responseOne = response_to_object($dataOne);
+        $responseAll = response_to_object($dataAll);
 
         $this->assertIsArray($responseOne->toArray());
         $this->assertIsArray($responseAll->toArray());
@@ -48,8 +48,8 @@ class ResponseTest extends TestCase
     {
         $dataOne = FakeApiRequest::getOne();
         $customResource = CustomResource::class;
-        $this->assertInstanceOf($customResource, Response::resource($dataOne, $customResource));
-        $this->assertInstanceOf($customResource, Response::collection($dataOne, $customResource));
+        $this->assertInstanceOf($customResource, response_to_object($dataOne, $customResource));
+        $this->assertInstanceOf($customResource, response_to_object($dataOne, $customResource));
         $this->assertInstanceOf($customResource, (new Response($customResource))->make($dataOne));
     }
 
@@ -59,7 +59,7 @@ class ResponseTest extends TestCase
         $dataAll = FakeApiRequest::getAll();
         $resource = Resource::class;
         $customCollection = CustomCollection::class;
-        $this->assertInstanceOf($customCollection, Response::collection($dataAll, $resource, $customCollection));
+        $this->assertInstanceOf($customCollection, response_to_object($dataAll, $resource, $customCollection));
         $this->assertInstanceOf($customCollection, (new Response($resource, $customCollection))->make($dataAll));
     }
 
@@ -67,19 +67,19 @@ class ResponseTest extends TestCase
     public function shouldAcceptObjectAndReturnObject()
     {
         $dataOne = FakeApiRequest::getOne();
-        $resource = Response::resource($dataOne);
+        $resource = response_to_object($dataOne);
         $customResource = CustomResource::class;
-        $this->assertInstanceOf($customResource, Response::resource($resource, $customResource));
+        $this->assertInstanceOf($customResource, response_to_object($resource, $customResource));
     }
 
     /** @test */
     public function shouldHaveCustomAttributeSetted()
     {
         $dataOne = FakeApiRequest::getOne();
-        $resource = Response::resource($dataOne);
+        $resource = response_to_object($dataOne);
         $customResource = CustomResourceWithCustomAttributes::class;
-        $response = Response::resource($resource, $customResource);
-        $this->assertNotEmpty($response->myCustomAttribute);
+        $response = response_to_object($resource, $customResource);
+        $this->assertNotEmpty($response->getMyCustomAttribute());
     }
 
     /** @test */
@@ -90,8 +90,7 @@ class ResponseTest extends TestCase
                 'second_stage'=> 'value'
             ]
         ];
-        $resource = Response::resource($data,CustomResourceWithoutGoDeeper::class);
-
+        $resource = response_to_object($data,CustomResourceWithoutGoDeeper::class);
         $this->assertIsArray($resource->firstStage);
         $this->assertEquals($resource->firstStage, $data['first_stage']);
     }
@@ -102,7 +101,7 @@ class ResponseTest extends TestCase
         $data = [
             'firstAttribute'=> 'value'
         ];
-        $resource = Response::resource($data,CustomResourceCases::class);
+        $resource = response_to_object($data,CustomResourceCases::class);
         $this->assertEquals($resource->toArray()['first_attribute'], $data['firstAttribute']);
         $this->assertEquals($resource->toOriginalArray()['firstAttribute'], $data['firstAttribute']);
     }
