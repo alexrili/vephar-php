@@ -6,7 +6,7 @@ use Hell\Vephar\Fake\CustomCollection;
 use Hell\Vephar\Fake\CustomResource;
 use Hell\Vephar\Fake\CustomResourceCases;
 use Hell\Vephar\Fake\CustomResourceWithCustomAttributes;
-use Hell\Vephar\Fake\CustomResourceWithoutGoDeeper;
+use Hell\Vephar\Fake\CustomResourceWithKeepdigging;
 use Hell\Vephar\Fake\FakeApiRequest;
 
 class ResponseTest extends TestCase
@@ -83,16 +83,17 @@ class ResponseTest extends TestCase
     }
 
     /** @test */
-    public function shouldNotObjectfyNestedArrayWhenNestedIsSetToFalse()
+    public function shouldObjectfyNestedArrayWhenKeepdigginIsSetToTrue()
     {
         $data = [
-            'first_stage'=>[
+            'attribute'=>[
                 'second_stage'=> 'value'
-            ]
+            ],
+            'snake_to_camel'=> 'snakeToCamel'
         ];
-        $resource = response_to_object($data,CustomResourceWithoutGoDeeper::class);
-        $this->assertIsArray($resource->firstStage);
-        $this->assertEquals($resource->firstStage, $data['first_stage']);
+        $resource = response_to_object($data,CustomResourceWithKeepdigging::class);
+        $this->assertInstanceOf(Resource::class, $resource->attribute);
+        $this->assertEquals($resource->snakeToCamel, $data['snake_to_camel']);
     }
 
     /** @test */

@@ -5,7 +5,6 @@ namespace Hell\Vephar\Contracts;
 
 use Hell\Vephar\Helpers\Str;
 use Hell\Vephar\Resource;
-use Hell\Vephar\Response;
 
 
 /**
@@ -18,7 +17,7 @@ abstract class ResourceContract
     /**
      * @var bool
      */
-    protected $keepRecursion = false;
+    protected $keepDigging = false;
     /**
      * @var bool
      */
@@ -83,10 +82,10 @@ abstract class ResourceContract
      */
     protected function getValue($value)
     {
-        if (!$this->keepRecursion || !is_array($value)) {
+        if (!$this->keepDigging || !is_array($value)) {
             return $value;
         }
-        return Response::resource($value);
+        return response_to_object($value);
     }
 
     /**
@@ -96,9 +95,9 @@ abstract class ResourceContract
     {
         $object = $this;
         $child = get_class($object);
-        if ($child == Resource::class) {
+        if ($child === Resource::class) {
             foreach ($data as $attribute => $value) {
-                $attributeName = $this->getAttributeName($attribute);
+                $attributeName = Str::toCamelCase($attribute);
                 $this->{$attributeName} = $this->getValue($value);
             }
             return;
@@ -114,21 +113,21 @@ abstract class ResourceContract
     }
 
     /**
-     * @param $attributeName
-     * @return mixed|string
-     */
-    protected function getAttributeName($attributeName)
-    {
-        return $this->toCamelCase ? Str::toCamelCase($attributeName) : $attributeName;
-    }
-
-    /**
      * @param $attribute
      * @return false|int
      */
     protected function isReservedVar($attribute)
     {
         return preg_match("/" . $attribute . "/", RESERVED_VARS);
+    }
+
+    /**
+     * @param $attributeName
+     * @return mixed|string
+     */
+    protected function getAttributeName($attributeName)
+    {
+        return $this->toCamelCase ? Str::toCamelCase($attributeName) : $attributeName;
     }
 
     /**
